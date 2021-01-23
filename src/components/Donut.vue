@@ -2,7 +2,12 @@
 <div class="cdc-container" :style="placementStyles.container">
   <div class="cdc" ref="donut" :style="donutStyles">
     <donut-sections
-      v-on="sectionListeners"
+      @section-click="onSectionClick"
+      @section-mouseenter="onSectionMouseenter"
+      @section-mouseleave="onSectionMouseleave"
+      @section-mouseover="onSectionMouseover"
+      @section-mouseout="onSectionMouseout"
+      @section-mousemove="onSectionMousemove"
       :sections="donutSections"
       :start-angle="startAngle">
     </donut-sections>
@@ -25,7 +30,6 @@
 </template>
 
 <script>
-import { nativeSectionEvents } from '../utils/events';
 import defaultColors from '../utils/colors';
 import { placement, placementStyles, sectionValidator } from '../utils/misc';
 import DonutSections from './DonutSections.vue';
@@ -101,7 +105,6 @@ export default {
     return {
       donutEl: null,
       fontSize: '1em',
-
       resizeListener: null
     };
   },
@@ -202,12 +205,6 @@ export default {
       const { fontSize } = this;
       return { fontSize };
     },
-    sectionListeners() {
-      return nativeSectionEvents.reduce((acc, { sectionEventName }) => ({
-        ...acc,
-        [sectionEventName]: (...args) => this.emitSectionEvent(sectionEventName, ...args)
-      }), {});
-    }
   },
   methods: {
     recalcFontSize() {
@@ -229,9 +226,24 @@ export default {
         this.fontSize = widthInPx ? `${(widthInPx * scaleDownBy).toFixed(2)}px` : '1em';
       });
     },
-    emitSectionEvent(sectionEventName, ...args) {
-      this.$emit(sectionEventName, ...args);
-    }
+    onSectionClick(section, event) {
+      this.$emit('section-click', section, event);
+    },
+    onSectionMouseenter(section, event) {
+      this.$emit('section-mouseenter', section, event);
+    },
+    onSectionMouseleave(section, event) {
+      this.$emit('section-mouseleave', section, event);
+    },
+    onSectionMouseover(section, event) {
+      this.$emit('section-mouseover', section, event);
+    },
+    onSectionMouseout(section, event) {
+      this.$emit('section-mouseout', section, event);
+    },
+    onSectionMousemove(section, event) {
+      this.$emit('section-mousemove', section, event);
+    },
   },
   created() {
     this.resizeListener = this.recalcFontSize.bind(this);
@@ -244,7 +256,7 @@ export default {
       window.addEventListener('resize', this.resizeListener);
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener('resize', this.resizeListener);
   },
   components: { DonutSections }

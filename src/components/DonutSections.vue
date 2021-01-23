@@ -22,6 +22,14 @@ export default {
     startAngle: { type: Number, default: 0 },
     sections: { type: Array, default: () => [] }
   },
+  emits: [
+    'section-click',
+    'section-mouseenter',
+    'section-mouseleave',
+    'section-mouseover',
+    'section-mouseout',
+    'section-mousemove'
+  ],
   computed: {
     containerStyles() {
       return {

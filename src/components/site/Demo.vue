@@ -11,7 +11,13 @@
     <a href="https://github.com/dumptyd/vue-css-donut-chart">GitHub</a>
   </nav>
   <div class="container-donut">
-    <donut v-on="listeners" v-bind="donutProps">
+    <donut v-bind="donutProps"
+          @section-click="onSectionClick"
+          @section-mouseenter="onSectionMouseenter"
+          @section-mouseleave="onSectionMouseleave"
+          @section-mouseover="onSectionMouseover"
+          @section-mouseout="onSectionMouseout"
+          @section-mousemove="onSectionMousemove">
       <div v-html="donutHTML"></div>
     </donut>
   </div>
@@ -226,7 +232,7 @@ export default {
         hasLegend, legendPlacement,
         autoAdjustTextSize,
         sections: validatedSections, total: computedTotal > 0 ? computedTotal : 100,
-        startAngle: computedStartAngle || 0
+        startAngle: computedStartAngle || 0,
       };
     },
     consumed() {
@@ -243,12 +249,6 @@ export default {
       ) return [];
       return this.sections;
     },
-    listeners() {
-      return this.events.filter(event => event.enabled).reduce((acc, curr) => ({
-        ...acc,
-        [curr.sectionEventName]: (...args) => this.handleSectionEvent(curr, ...args)
-      }), {});
-    }
   },
   methods: {
     addSection() {
@@ -261,7 +261,7 @@ export default {
     removeSection(idx) {
       this.sections.splice(idx, 1);
     },
-    handleSectionEvent({ sectionEventName }, section, event) {
+    handleSectionEvent(sectionEventName, section, event) {
       const info = [
         ['-'.repeat(10)],
         [`"${sectionEventName}" occurred on "${section.label || 'Unnamed section'}"`],
@@ -270,7 +270,31 @@ export default {
       ];
       // eslint-disable-next-line no-console
       info.forEach(args => console.log(...args));
-    }
+    },
+    onSectionClick(section, event) {
+      if (!this.events[0].enabled) return;
+      this.handleSectionEvent('section-click', section, event);
+    },
+    onSectionMouseenter(section, event) {
+      if (!this.events[1].enabled) return;
+      this.handleSectionEvent('section-mouseenter', section, event);
+    },
+    onSectionMouseleave(section, event) {
+      if (!this.events[2].enabled) return;
+      this.handleSectionEvent('section-mouseleave', section, event);
+    },
+    onSectionMouseover(section, event) {
+      if (!this.events[3].enabled) return;
+      this.handleSectionEvent('section-mouseover', section, event);
+    },
+    onSectionMouseout(section, event) {
+      if (!this.events[4].enabled) return;
+      this.handleSectionEvent('section-mouseout', section, event);
+    },
+    onSectionMousemove(section, event) {
+      if (!this.events[5].enabled) return;
+      this.handleSectionEvent('section-mousemove', section, event);
+    },
   },
   components: { Donut }
 };
